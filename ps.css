@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+    overflow: hidden;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.webgl {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.caption {
+    position: fixed;
+    top: 300px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
