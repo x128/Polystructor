@@ -21,7 +21,7 @@ function updateViewSize()
         console.error('[view::updateViewSize] unknown options');
 
     if (m_renderer)
-        renderer.setSize(m_size.width, m_size.height);
+        m_renderer.setSize(m_size.width, m_size.height);
 
     if (m_camera)
     {
