@@ -17,10 +17,8 @@
 	<body>
 
 
-		<script src="Three.js"></script>
+		<script src="../../lib/three.js"></script>
 
-		<script src="Detector.js"></script>
-	
 	<script src="OrbitControls.js"></script>
 
 		<script src="KeyboardState.js"></script>
@@ -99,12 +97,12 @@ animate();
 	
 				// RENDERER
 	
-				if ( Detector.webgl )
+//				if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
-	
-				else
-		renderer = new THREE.CanvasRenderer(); 
-	
+
+//				else
+//		renderer = new THREE.CanvasRenderer();
+
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	
 				container = document.getElementById( 'ThreeJS' );
