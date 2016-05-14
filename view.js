@@ -2,9 +2,8 @@ var ViewOptions = {
     FullScreen : 0x1
 };
 
-var m_scene, m_camera, m_renderer;
-var m_size;
-var m_options;
+var m_scene, m_camera, m_renderer, m_orbitControls;
+var m_options, m_size;
 var m_animationFrameRequest;
 
 function updateViewSize()
@@ -147,6 +146,8 @@ function create(options)
     m_scene.add(ambientLight);
 
     setWindowResizeHandler(updateViewSize);
+
+    m_orbitControls = new THREE.OrbitControls(m_camera, m_renderer.domElement);
 }
 
 function setWindowResizeHandler(callback)

@@ -1,5 +1,6 @@
 //THREE = require('lib/three.js/build/three.min.js');
 THREE = require('lib/three.js/build/three.js');
+require('lib/three.js/examples/js/controls/OrbitControls.js');
 
 var view = require('view');
 //console.log(view);
