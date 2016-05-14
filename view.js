@@ -116,8 +116,7 @@ function onMouseMove()
     var mouse = new THREE.Vector2(x, y);
     m_raycaster.setFromCamera(mouse, m_camera);
     var intersects = m_raycaster.intersectObjects(m_intersectableObjects, false);
-
-    console.log(intersects);
+    //console.log(intersects);
 }
 
 function setWindowResizeHandler(callback)
@@ -153,7 +152,9 @@ function stopRendering()
 function addDetail(detail, pos)
 {
     m_scene.add(detail);
-    //detail.position = pos;
+    detail.position.x = pos.x;
+    detail.position.y = pos.y;
+    detail.position.z = pos.z;
 
     m_intersectableObjects = m_intersectableObjects || [];
     m_intersectableObjects.extend(detail.intersectableObjects);
