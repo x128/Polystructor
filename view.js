@@ -105,18 +105,33 @@ function createControls()
 
     m_raycaster = new THREE.Raycaster();
 
-    //document.addEventListener('mousedown', onMouseDown);
-    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousedown', onMouseDown);
+    //document.addEventListener('mousemove', onMouseMove);
 }
 
-function onMouseMove()
+function objectUnderCursor()
 {
     var x = (event.clientX / m_size.width) * 2 - 1;
     var y = -(event.clientY / m_size.height) * 2 + 1;
     var mouse = new THREE.Vector2(x, y);
     m_raycaster.setFromCamera(mouse, m_camera);
-    var intersects = m_raycaster.intersectObjects(m_intersectableObjects, false);
-    //console.log(intersects);
+    var intersections = m_raycaster.intersectObjects(m_intersectableObjects, false);
+    return intersections.length ? intersections[0] : null;
+}
+
+function onMouseMove()
+{
+}
+
+function onMouseDown()
+{
+    // TODO: mouseDown + mouseUp not far from each other
+    var obj = objectUnderCursor();
+    if (obj && obj.object)
+    {
+        console.log(obj.object);
+        obj.object.selectCorner();
+    }
 }
 
 function setWindowResizeHandler(callback)
