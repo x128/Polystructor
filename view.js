@@ -1,10 +1,12 @@
 var ViewOptions = {
-    FullScreen : 0x1
+    FullScreen : 0x1,
+    ShowAxes : 0x2
 };
 
-var m_scene, m_camera, m_renderer, m_orbitControls;
+var m_scene, m_camera, m_renderer, m_orbitControls, m_raycaster;
 var m_options, m_size;
 var m_animationFrameRequest;
+var m_intersectableObjects;
 
 function updateViewSize()
 {
@@ -45,73 +47,25 @@ function create(options)
     m_renderer.shadowMapEnabled = true;
 
 
+    if (m_options & ViewOptions.ShowAxes)
+    {
+        var axes = new THREE.AxisHelper(20);
+        m_scene.add(axes);
+    }
 
 
-
-    // show axes in the screen
-//        var axes = new THREE.AxisHelper(20);
-//        scene.add(axes);
-
-    // create the ground plane
     var planeGeometry = new THREE.PlaneGeometry(50, 50);
     var planeMaterial = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
-    var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    var floor = new THREE.Mesh(planeGeometry, planeMaterial);
 
-    // rotate and position the plane
-    plane.rotation.x = -0.5 * Math.PI;
-    plane.position.x = 0;
-    plane.position.y = -5.05;
-    plane.position.z = 0;
+    floor.rotation.x = -0.5 * Math.PI;
+    floor.position.x = 0;
+    floor.position.y = -5.05;
+    floor.position.z = 0;
 
-    // add the plane to the scene
-    m_scene.add(plane);
-    plane.receiveShadow = true;
+    m_scene.add(floor);
+    floor.receiveShadow = true;
 
-    // create a cube
-    var cubeGeometry = new THREE.BoxGeometry(10, 10, 0.5);
-    var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
-    var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-
-    // position the cube
-    cube.position.x = 0;
-    cube.position.y = 0;
-    cube.position.z = 0;
-
-//        cube.receiveShadow = true;
-    cube.castShadow = true;
-
-
-    var corner = function(dx, dy) {
-
-        // create a cube
-        var cubeGeometry2 = new THREE.BoxGeometry(2.5, 2.5, 0.6);
-        var cubeMaterial2 = new THREE.MeshLambertMaterial({color: 0xAA0000});
-        var cube2 = new THREE.Mesh(cubeGeometry2, cubeMaterial2);
-
-        // position the cube
-        cube2.position.x = 3.8 * dx;
-        cube2.position.y = 3.8 * dy;
-        cube2.position.z = 0;
-
-        cube2.receiveShadow = true;
-        cube2.castShadow = true;
-
-        return cube2;
-    };
-
-    var corners = [
-        corner(1, 1),
-        corner(1, -1),
-        corner(-1, 1),
-        corner(-1, -1)];
-
-    var group = new THREE.Object3D();
-    group.add(cube);
-
-    for (var i = 0; i < 4; i++)
-        group.add(corners[i]);
-
-    m_scene.add(group);
 
     // position and point the camera to the center of the scene
     m_camera.position.x = -30;
@@ -120,8 +74,6 @@ function create(options)
 
     var pos = m_scene.position;
     pos.y += 13;
-
-//        camera.lookAt(scene.position);
     m_camera.lookAt(pos);
 
     var spotLight = new THREE.SpotLight(0xffffff);
@@ -131,23 +83,41 @@ function create(options)
 
 
 
-
-    var webGLDiv = document.createElement('div');
-    webGLDiv.style.position = 'absolute';
-    webGLDiv.style.left = 0;
-    webGLDiv.style.top = 0;
-    document.getElementsByTagName('body')[0].appendChild(webGLDiv);
-    webGLDiv.appendChild(m_renderer.domElement);
-
-    //document.getElementsByTagName('body')[0].appendChild(renderer.domElement);
+    var glDiv = document.createElement('div');
+    glDiv.style.position = 'absolute';
+    glDiv.style.left = 0;
+    glDiv.style.top = 0;
+    document.getElementsByTagName('body')[0].appendChild(glDiv);
+    glDiv.appendChild(m_renderer.domElement);
 
     var ambientLight = new THREE.AmbientLight(0x0c0c0c);
 //        ambientLight.castShadow = true;
     m_scene.add(ambientLight);
 
+    createControls();
+}
+
+function createControls()
+{
     setWindowResizeHandler(updateViewSize);
 
     m_orbitControls = new THREE.OrbitControls(m_camera, m_renderer.domElement);
+
+    m_raycaster = new THREE.Raycaster();
+
+    //document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mousemove', onMouseMove);
+}
+
+function onMouseMove()
+{
+    var x = (event.clientX / m_size.width) * 2 - 1;
+    var y = -(event.clientY / m_size.height) * 2 + 1;
+    var mouse = new THREE.Vector2(x, y);
+    m_raycaster.setFromCamera(mouse, m_camera);
+    var intersects = m_raycaster.intersectObjects(m_intersectableObjects, false);
+
+    console.log(intersects);
 }
 
 function setWindowResizeHandler(callback)
@@ -180,7 +150,22 @@ function stopRendering()
     window.cancelAnimationFrame(m_animationFrameRequest);
 }
 
+function addDetail(detail, pos)
+{
+    m_scene.add(detail);
+    //detail.position = pos;
+
+    m_intersectableObjects = m_intersectableObjects || [];
+    m_intersectableObjects.extend(detail.intersectableObjects);
+}
+
+function recalcIntersectableObjects()
+{
+    // TODO (on add/remove details)
+}
+
 exports.ViewOptions = ViewOptions;
 exports.create = create;
 exports.startRendering = startRendering;
 exports.stopRendering = stopRendering;
+exports.addDetail = addDetail;
