@@ -1,4 +1,5 @@
-THREE = require('lib/three.js');
+//THREE = require('lib/three.js/build/three.min.js');
+THREE = require('lib/three.js/build/three.js');
 
 var view = require('view');
 //console.log(view);
