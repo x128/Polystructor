@@ -95,6 +95,8 @@ function create(options)
     m_scene.add(ambientLight);
 
     createControls();
+
+    return { camera : m_camera, scene : m_scene };
 }
 
 function createControls()

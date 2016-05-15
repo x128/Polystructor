@@ -25,7 +25,7 @@ function bakeSquare(args)
         console.log(arg);
     };
 
-    var mushroomBox = new Box(width, width, depth, 0xFF0000, false);
+    var mushroomBox = new Box(args, width, width, depth, 0xFF0000, false);
     mushroomBox.position.x = 0;
     mushroomBox.position.y = 0;
     mushroomBox.position.z = 0;
@@ -61,7 +61,7 @@ function createEdge(args, i, label)
     var edgeWidth = 0.1 * args.width;
     var edgeDepth = 1.1 * args.depth;
 
-    var box = new Box(edgeDepth, edgeWidth, edgeLength, 0x00FF00, true, 0xFFFFFF);
+    var box = new Box(args, edgeDepth, edgeWidth, edgeLength, 0x00FF00, true, 0xFFFFFF);
 
     var radius = (args.width - edgeWidth) / 2 * 1.01;
     var angle = i * Math.PI / 2;
@@ -78,7 +78,7 @@ function createCorner(args, i, label)
     var cornerWidth = 0.2 * args.width;
     var cornerDepth = 1.2 * args.depth;
 
-    var box = new Box(cornerWidth, cornerWidth, cornerDepth, 0xAA0000, true, 0xFFFFFF);
+    var box = new Box(args, cornerWidth, cornerWidth, cornerDepth, 0xAA0000, true, 0xFFFFFF);
 
     var radius = (args.width - cornerWidth) * Math.sqrt(2) / 2 * 1.02;
     var angle = Math.PI * (0.25 + 0.5 * i);
@@ -92,11 +92,45 @@ function createCorner(args, i, label)
 // FIXME: we definitely need some better polymorphism here
 //Box.prototype = new THREE.Mesh();
 //Box.prototype.constructor = Box;
-function Box(width, height, depth, color, selectable, selectionColor, highlightColor)
+function Box(args, width, height, depth, color, selectable, selectionColor, highlightColor)
 {
     var geometry = new THREE.BoxGeometry(width, height, depth);
     var material = new THREE.MeshLambertMaterial({ color : color });
     var box = new THREE.Mesh(geometry, material);
+
+if (selectable) {
+    console.log('hi');
+    console.log(args);
+    console.log(args.view);
+    console.log(args.view.scene);
+    console.log(args.view.camera);
+    var customMaterial = new THREE.ShaderMaterial(
+        {
+            uniforms: {
+                "c": {type: "f", value: 0.1},
+                "p": {type: "f", value: 4.2},
+                glowColor: {type: "c", value: new THREE.Color(0xFFFF00)}//,
+                //viewVector: { type: "v3", value: args.view.camera.position }
+            },
+            //vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
+            //fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+            side: THREE.FrontSide,
+            blending: THREE.AdditiveBlending,
+            transparent: true
+        }
+    );
+
+    var smoothCubeGeom = geometry.clone();
+    var modifier = new THREE.SubdivisionModifier(2);
+    modifier.modify(smoothCubeGeom);
+
+    var glow = new THREE.Mesh(smoothCubeGeom, customMaterial.clone());
+    glow.position = box.position;
+    glow.scale.multiplyScalar(1.5);
+
+    //args.view.scene.add(glow);
+    box.add(glow);
+}
 
     box.selectable = selectable;
     if (selectable)
