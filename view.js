@@ -6,7 +6,7 @@ var ViewOptions = {
 var m_scene, m_camera, m_renderer, m_orbitControls, m_raycaster;
 var m_options, m_size;
 var m_animationFrameRequest;
-var m_intersectableObjects;
+var m_selectableObjects;
 
 function updateViewSize()
 {
@@ -44,7 +44,7 @@ function create(options)
     m_renderer = new THREE.WebGLRenderer();
     m_renderer.setClearColor(new THREE.Color(0x111C32));
     m_renderer.setSize(m_size.width, m_size.height);
-    m_renderer.shadowMapEnabled = true;
+    m_renderer.shadowMap.enabled = true;
 
 
     if (m_options & ViewOptions.ShowAxes)
@@ -106,7 +106,7 @@ function createControls()
     m_raycaster = new THREE.Raycaster();
 
     document.addEventListener('mousedown', onMouseDown);
-    //document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousemove', onMouseMove);
 }
 
 function objectUnderCursor()
@@ -115,22 +115,46 @@ function objectUnderCursor()
     var y = -(event.clientY / m_size.height) * 2 + 1;
     var mouse = new THREE.Vector2(x, y);
     m_raycaster.setFromCamera(mouse, m_camera);
-    var intersections = m_raycaster.intersectObjects(m_intersectableObjects, false);
+    var intersections = m_raycaster.intersectObjects(m_selectableObjects, false);
     return intersections.length ? intersections[0] : null;
+}
+
+function performUnderCursor(callbackThis, callbackOthers)
+{
+    var smth = objectUnderCursor();
+    if (smth && smth.object && smth.object.selectable)
+    {
+        m_selectableObjects.forEach(function(o) {
+            if (o != smth.object)
+                callbackOthers(o);
+        });
+        callbackThis(smth.object);
+    }
 }
 
 function onMouseMove()
 {
+    performUnderCursor(
+        function(obj) { obj.highlight() },
+        function(obj) { if (obj.highlighted) obj.fadetoblack(); }
+    );
 }
 
 function onMouseDown()
 {
     // TODO: mouseDown + mouseUp not far from each other
-    var obj = objectUnderCursor();
-    if (obj && obj.object)
+    performUnderCursor(
+        function(obj) { obj.select() },
+        function(obj) { if (obj.selected) obj.deselect(); }
+    );
+return;
+    var smth = objectUnderCursor();
+    if (smth && smth.object && smth.object.selectable)
     {
-        console.log(obj.object);
-        obj.object.selectCorner();
+        m_selectableObjects.forEach(function(o) {
+            if (o != smth.object && o.selected) o.deselect();
+        });
+        smth.object.select();
     }
 }
 
@@ -171,13 +195,12 @@ function addDetail(detail, pos)
     detail.position.y = pos.y;
     detail.position.z = pos.z;
 
-    m_intersectableObjects = m_intersectableObjects || [];
-    m_intersectableObjects.extend(detail.intersectableObjects);
+    m_selectableObjects = m_selectableObjects || [];
+    m_selectableObjects.extend(detail.selectableObjects);
 }
-
-function recalcIntersectableObjects()
+// + TODO:
+function recalcSelectableObjects()
 {
-    // TODO (on add/remove details)
 }
 
 exports.ViewOptions = ViewOptions;

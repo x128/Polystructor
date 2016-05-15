@@ -23,5 +23,6 @@ var detail2 = mushroominator.bake({
 });
 var pos2 = new THREE.Vector3(0, 10, 0);
 view.addDetail(detail2, pos2 /*, orientation */);
+detail2.rotateY(Math.PI / 3);
 
 view.startRendering();
