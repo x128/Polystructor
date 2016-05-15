@@ -19,7 +19,6 @@ function bakeSquare(args)
     var depth = args.depth;
 
     var detail = new THREE.Object3D();
-    detail.intersectableObjects = [];
     detail.selectEdge = function(arg) {
         console.log(arg);
     };
@@ -42,23 +41,20 @@ function bakeSquare(args)
         createCorner(args, 3, 'NW')];
 
     var edges = [
-        createEdge(0, 'N')/*,
-        createEdge(1, 'E'),
-        createEdge(2, 'S'),
-        createEdge(3, 'W')*/];
+        createEdge(args, 0, 'N'),
+        createEdge(args, 1, 'E'),
+        createEdge(args, 2, 'S'),
+        createEdge(args, 3, 'W')];
 
     detail.add(mushroomBox);
-
     for (var i = 0; i < 4; i++)
     {
         detail.add(corners[i]);
-        //detail.add(edges[i]);
+        detail.add(edges[i]);
     }
-    console.log(edges[0]);
-    //detail.add(edges[0]);
 
     detail.intersectableObjects = corners;
-    //detail.intersectableObjects = corners.extend(edges);
+    detail.intersectableObjects.extend(edges);
 
     return detail;
 }
@@ -66,18 +62,23 @@ function bakeSquare(args)
 function createEdge(args, i, label)
 {
     var edgeLength = args.width;
+    var edgeWidth = 0.1 * args.width;
     var edgeDepth = 1.1 * args.depth;
 
-    var geometry = new THREE.BoxGeometry(edgeDepth, edgeDepth, edgeLength);
+    var geometry = new THREE.BoxGeometry(edgeDepth, edgeWidth, edgeLength);
     var material = new THREE.MeshLambertMaterial({color: 0x00FF00});
     var box = new THREE.Mesh(geometry, material);
 
-    box.position.x = (edgeLength - edgeDepth) / 2;
-    box.position.y = 0;//2.05 * cornerWidth * (Math.floor(i / 2) * 2 - 1);
-    box.position.z = 0;
+    var radius = (args.width - edgeWidth) / 2 * 1.01;
+    var angle = i * Math.PI / 2;
+    box.position.x = radius * Math.sin(angle);
+    box.position.y = radius * Math.cos(angle);
+
+    box.rotateY(Math.PI / 2);
+    box.rotateX(angle);
 
     box.castShadow = true;
-    box.receiveShadow = true;
+    //box.receiveShadow = true;
 
     box.selectEdge = function() {
         console.log('selectEdge');
@@ -96,14 +97,14 @@ function createCorner(args, i, label)
     var material = new THREE.MeshLambertMaterial({color: 0xAA0000});
     var box = new THREE.Mesh(geometry, material);
 
-// TODO: align 'em N E S W
-    // this is a wrong formula
-    box.position.x = 2.05 * cornerWidth * ((i % 2) * 2 - 1);
-    box.position.y = 2.05 * cornerWidth * (Math.floor(i / 2) * 2 - 1);
+    var radius = (args.width - cornerWidth) * Math.sqrt(2) / 2 * 1.02;
+    var angle = Math.PI * (0.25 + 0.5 * i);
+    box.position.x = radius * Math.sin(angle);
+    box.position.y = radius * Math.cos(angle);
     box.position.z = 0;
 
     box.castShadow = true;
-    box.receiveShadow = true;
+    //box.receiveShadow = true;
 
     box.selectCorner = function() {
         console.log('selectCorner');
