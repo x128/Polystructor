@@ -41,7 +41,7 @@ function create(options)
 
     m_camera = new THREE.PerspectiveCamera(45, m_size.aspectRatio, 1, 100);
 
-    m_renderer = new THREE.WebGLRenderer();
+    m_renderer = new THREE.WebGLRenderer({ antialias : true });
     m_renderer.setClearColor(new THREE.Color(0x111C32));
     m_renderer.setSize(m_size.width, m_size.height);
     m_renderer.shadowMap.enabled = true;
