@@ -3,6 +3,8 @@ THREE = require('lib/three.js/build/three.js');
 require('lib/three.js/examples/js/controls/OrbitControls.js');
 require('lib/three.js/examples/js/modifiers/SubdivisionModifier.js');
 require('utils');
+THREEx = require('lib/threex.js');
+console.log(THREEx);
 
 var View = require('view');
 var view = View.create(View.ViewOptions.FullScreen | View.ViewOptions.ShowAxes);

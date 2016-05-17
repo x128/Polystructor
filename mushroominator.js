@@ -98,6 +98,7 @@ function Box(args, width, height, depth, color, selectable, selectionColor, high
     var material = new THREE.MeshLambertMaterial({ color : color });
     var box = new THREE.Mesh(geometry, material);
 
+    /*
 if (selectable) {
     console.log('hi');
     console.log(args);
@@ -130,7 +131,65 @@ if (selectable) {
 
     //args.view.scene.add(glow);
     box.add(glow);
-}
+}*/
+
+
+
+    var glowMesh = new THREEx.GeometricGlowMesh(box);
+    //box = glowMesh.object3d;
+    box.add(glowMesh.object3d);
+
+    var insideUniforms	= glowMesh.insideMesh.material.uniforms;
+    insideUniforms.glowColor.value.set(color);
+    insideUniforms['coeficient'].value = 0.4;
+    insideUniforms['power'].value = 3;
+    //insideUniforms.glowColor.value.set('hotpink');
+
+    var outsideUniforms	= glowMesh.outsideMesh.material.uniforms;
+    outsideUniforms.glowColor.value.set(color);
+    insideUniforms['coeficient'].value = 0.4;
+    insideUniforms['power'].value = 3;
+    //outsideUniforms.glowColor.value.set('hotpink');
+
+
+
+/*
+    var uniforms	= material.uniforms
+    // options
+    var options  = {
+        coeficient	: uniforms['coeficient'].value,
+        power		: uniforms['power'].value,
+        glowColor	: '#'+uniforms.glowColor.value.getHexString(),
+        presetFront	: function(){
+            options.coeficient	= 1
+            options.power		= 2
+            onChange()
+        },
+        presetBack	: function(){
+            options.coeficient	= 0.5
+            options.power		= 4.0
+            onChange()
+        },
+    }
+    var onChange = function(){
+        uniforms['coeficient'].value	= options.coeficient
+        uniforms['power'].value		= options.power
+        uniforms.glowColor.value.set( options.glowColor );
+    }
+    onChange()
+
+    // config datGui
+    datGui.add( options, 'coeficient'	, 0.0 , 2)
+        .listen().onChange( onChange )
+    datGui.add( options, 'power'		, 0.0 , 5)
+        .listen().onChange( onChange )
+    datGui.addColor( options, 'glowColor' )
+        .listen().onChange( onChange )
+    datGui.add( options, 'presetFront' )
+    datGui.add( options, 'presetBack' )
+*/
+
+
 
     box.selectable = selectable;
     if (selectable)

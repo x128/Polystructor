@@ -190,7 +190,8 @@ function init()
 	moonGlow.scale.multiplyScalar(1.2);
 	scene.add( moonGlow );
 	
-	var cubeGeom = new THREE.CubeGeometry(150,150,150,2,2,2);
+//	var cubeGeom = new THREE.CubeGeometry(150,150,150,2,2,2);
+	var cubeGeom = new THREE.CubeGeometry(1500,150,150,2,2,2);
 	var crateTexture = THREE.ImageUtils.loadTexture( 'images/crate.png' );
 	var crateMaterial = new THREE.MeshBasicMaterial( { map: crateTexture } );
     this.crate = new THREE.Mesh(cubeGeom, crateMaterial);
