@@ -6,7 +6,10 @@ var ViewOptions = {
 var m_scene, m_camera, m_renderer, m_orbitControls, m_raycaster;
 var m_options, m_size;
 var m_animationFrameRequest;
-var m_selectableObjects;
+
+var m_highlightHelper;
+var m_highlightableObjects = [];
+var m_isSomethingHighlighted = [];
 
 function updateViewSize()
 {
@@ -31,9 +34,10 @@ function updateViewSize()
     }
 }
 
-function create(options)
+function create(options, highlightHelper)
 {
     m_options = options;
+    m_highlightHelper = highlightHelper;
 
     updateViewSize();
 
@@ -91,7 +95,8 @@ function create(options)
     glDiv.appendChild(m_renderer.domElement);
 
     var ambientLight = new THREE.AmbientLight(0x0c0c0c);
-//        ambientLight.castShadow = true;
+    ambientLight.intensity = 10;
+    //ambientLight.castShadow = true;
     m_scene.add(ambientLight);
 
     createControls();
@@ -119,43 +124,45 @@ function objectUnderCursor()
     return intersections.length ? intersections[0] : null;
 }
 
-function performUnderCursor(callbackThis, callbackOthers)
+function recalcHighlight(mode)
 {
     var smth = objectUnderCursor();
-    if (smth && smth.object && smth.object.selectable)
+    if (smth && smth.object && smth.object.highlightable[mode])
     {
-        m_selectableObjects.forEach(function(o) {
-            if (o != smth.object)
-                callbackOthers(o);
+        m_highlightableObjects.forEach(function(obj) {
+            if (obj != smth.object && obj.highlighted[mode])
+                obj.unhighlight(mode);
         });
-        callbackThis(smth.object);
+        smth.object.highlight(mode);
+        m_isSomethingHighlighted[mode] = true;
+    }
+    else if (m_isSomethingHighlighted[mode])
+    {
+        m_selectableObjects.forEach(function(obj) {
+            obj.unhighlight(mode);
+        });
+        m_isSomethingHighlighted[mode] = false;
     }
 }
 
 function onMouseMove()
 {
-    performUnderCursor(
-        function(obj) { obj.highlight() },
-        function(obj) { if (obj.highlighted) obj.fadetoblack(); }
-    );
+    recalcHighlight('hover');
+    //performUnderCursor(
+    //    function(obj) { obj.highlight() },
+    //    function(obj) { if (obj.highlighted) obj.fadetoblack(); }
+    //);
 }
 
 function onMouseDown()
 {
-    // TODO: mouseDown + mouseUp not far from each other
-    performUnderCursor(
-        function(obj) { obj.select() },
-        function(obj) { if (obj.selected) obj.deselect(); }
-    );
-return;
-    var smth = objectUnderCursor();
-    if (smth && smth.object && smth.object.selectable)
-    {
-        m_selectableObjects.forEach(function(o) {
-            if (o != smth.object && o.selected) o.deselect();
-        });
-        smth.object.select();
-    }
+    // TODO: not just mouseDown, but mouseDown+mouseUp not far from each other
+    recalcHighlight(HighlightMode.Select);
+
+    //performUnderCursor(
+    //    function(obj) { obj.select() },
+    //    function(obj) { if (obj.selected) obj.deselect(); }
+    //);
 }
 
 function setWindowResizeHandler(callback)
