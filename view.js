@@ -81,6 +81,8 @@ function create(options)
     spotLight.castShadow = true;
     m_scene.add(spotLight);
 
+    var sky = new THREE.AmbientLight(0xeeeeff, 0.5);
+    m_scene.add(sky);
 
 
     var glDiv = document.createElement('div');

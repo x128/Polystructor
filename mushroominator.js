@@ -25,7 +25,7 @@ function bakeSquare(args)
         console.log(arg);
     };
 
-    var mushroomBox = new Box(width, width, depth, 0xFF0000, false);
+    var mushroomBox = new Box(width, width, depth, 0xb6afa5, false);
     mushroomBox.position.x = 0;
     mushroomBox.position.y = 0;
     mushroomBox.position.z = 0;
