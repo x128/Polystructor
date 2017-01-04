@@ -128,12 +128,12 @@ function createCorner(args, i, label)
     shape.lineTo(0, 0);
 
     var hole = new THREE.Path();
-    hole.moveTo(20, 70);
+    hole.moveTo(20, 50);
+    hole.lineTo(50, 20);
+    hole.lineTo(70, 20);
+    hole.lineTo(70, 40);
     hole.lineTo(40, 70);
-    hole.lineTo(70, 50);
-    hole.lineTo(70, 70);
-    hole.lineTo(50, 70);
-    hole.lineTo(20, 50);
+    hole.lineTo(20, 70);
     shape.holes = [hole];
 
     var extrudeSettings = { amount: thickness, bevelEnabled: false };
