@@ -10,8 +10,12 @@ var mushroominator = require('mushroominator');
 
 var detail = mushroominator.bake({
     type : mushroominator.DetailType.Square,
-    width : 10,
-    depth : 0.5
+    width : 450,
+    depth : 20,
+    cornerSize : 112.5,
+    chamfer : 22.5,
+    holeOffset : 25,
+    holeWidth : 10
 });
 var pos = new THREE.Vector3(0, 0, 0);
 view.addDetail(detail, pos /*, orientation */);
@@ -22,7 +26,7 @@ var detail2 = mushroominator.bake({
     depth : 2
 });
 var pos2 = new THREE.Vector3(0, 10, 0);
-view.addDetail(detail2, pos2 /*, orientation */);
+//view.addDetail(detail2, pos2 /*, orientation */);
 detail2.rotateY(Math.PI / 3);
 
 view.startRendering();

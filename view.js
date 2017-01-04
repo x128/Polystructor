@@ -39,7 +39,7 @@ function create(options)
 
     m_scene = new THREE.Scene();
 
-    m_camera = new THREE.PerspectiveCamera(45, m_size.aspectRatio, 1, 100);
+    m_camera = new THREE.PerspectiveCamera(45, m_size.aspectRatio, 100, 10000);
 
     m_renderer = new THREE.WebGLRenderer({ antialias : true });
     m_renderer.setClearColor(new THREE.Color(0x111C32));
@@ -68,9 +68,9 @@ function create(options)
 
 
     // position and point the camera to the center of the scene
-    m_camera.position.x = -30;
-    m_camera.position.y = 10;
-    m_camera.position.z = 30;
+    m_camera.position.x = -300;
+    m_camera.position.y = 100;
+    m_camera.position.z = 300;
 
     var pos = m_scene.position;
     pos.y += 13;

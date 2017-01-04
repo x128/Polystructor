@@ -25,10 +25,7 @@ function bakeSquare(args)
         console.log(arg);
     };
 
-    var mushroomBox = new Box(width, width, depth, 0xb6afa5, false);
-    mushroomBox.position.x = 0;
-    mushroomBox.position.y = 0;
-    mushroomBox.position.z = 0;
+    var mushroomBox = createMushroomBox(args);
 
     var corners = [
         createCorner(args, 0, 'NE'),
@@ -55,38 +52,102 @@ function bakeSquare(args)
     return detail;
 }
 
+function createMushroomBox(args) {
+    var cornerSize = args.cornerSize;
+    var thickness = args.depth;
+    var halfEdgeLength = args.width / 2 - cornerSize;
+    var halfWidth = args.width / 2 - args.chamfer;
+
+    var shape = new THREE.Shape();
+    shape.moveTo(halfEdgeLength, halfWidth);
+    shape.moveTo(halfEdgeLength, halfEdgeLength);
+    shape.lineTo(halfWidth, halfEdgeLength);
+    shape.lineTo(halfWidth, -halfEdgeLength);
+    shape.lineTo(halfEdgeLength, -halfEdgeLength);
+    shape.lineTo(halfEdgeLength, -halfWidth);
+    shape.lineTo(-halfEdgeLength, -halfWidth);
+    shape.lineTo(-halfEdgeLength, -halfEdgeLength);
+    shape.lineTo(-halfWidth, -halfEdgeLength);
+    shape.lineTo(-halfWidth, halfEdgeLength);
+    shape.lineTo(-halfEdgeLength, halfEdgeLength);
+    shape.lineTo(-halfEdgeLength, halfWidth);
+    shape.lineTo(halfEdgeLength, halfWidth);
+
+    var extrudeSettings = { amount: thickness, bevelEnabled: false };
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial( {color: 0xb6afa5 } );
+    var mushroom = new THREE.Mesh( geometry, material );
+
+    mushroom.position.z = -thickness / 2;
+
+    return mushroom;
+}
+
 function createEdge(args, i, label)
 {
-    var edgeLength = args.width;
-    var edgeWidth = 0.1 * args.width;
-    var edgeDepth = 1.1 * args.depth;
+    var cornerSize = args.cornerSize;
+    var edgeLength = args.width - 2 * cornerSize;
+    var thickness = args.depth;
+    var chamfer = args.chamfer;
 
-    var box = new Box(edgeDepth, edgeWidth, edgeLength, 0x00FF00, true, 0xFFFFFF);
+    var shape = new THREE.Shape();
+    shape.moveTo(-thickness / 2, -chamfer);
+    shape.lineTo(0, 0);
+    shape.lineTo(thickness / 2, -chamfer);
 
-    var radius = (args.width - edgeWidth) / 2 * 1.01;
+    var extrudeSettings = { amount: edgeLength, bevelEnabled: false };
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial( {color: 0x978F82 } );
+    var edge = new THREE.Mesh( geometry, material );
+
+    var radius = args.width / 2;
     var angle = i * Math.PI / 2;
-    box.position.x = radius * Math.sin(angle);
-    box.position.y = radius * Math.cos(angle);
-    box.rotateY(Math.PI / 2);
-    box.rotateX(angle);
+    edge.rotateY(Math.PI / 2);
+    edge.rotateX(angle);
+    edge.position.x = radius * Math.sin(angle) - edgeLength / 2 * Math.cos(angle);
+    edge.position.y = radius * Math.cos(angle) + edgeLength / 2 * Math.sin(angle);
 
-    return box;
+    return edge;
 }
 
 function createCorner(args, i, label)
 {
-    var cornerWidth = 0.2 * args.width;
-    var cornerDepth = 1.2 * args.depth;
+    var size = args.cornerSize;
+    var thickness = args.depth;
+    var halfEdgeLength = args.width / 2 - args.cornerSize;
+    var halfWidth = args.width / 2;
+    var holeOffset = args.holeOffset;
+    var holeWidth = args.holeWidth;
+    var cornerSize = args.cornerSize;
 
-    var box = new Box(cornerWidth, cornerWidth, cornerDepth, 0xAA0000, true, 0xFFFFFF);
+    var shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.lineTo(0, cornerSize);
+    shape.lineTo(cornerSize, cornerSize);
+    shape.lineTo(cornerSize, 0);
+    shape.lineTo(0, 0);
 
-    var radius = (args.width - cornerWidth) * Math.sqrt(2) / 2 * 1.02;
-    var angle = Math.PI * (0.25 + 0.5 * i);
-    box.position.x = radius * Math.sin(angle);
-    box.position.y = radius * Math.cos(angle);
-    box.position.z = 0;
+    var hole = new THREE.Path();
+    hole.moveTo(20, 70);
+    hole.lineTo(40, 70);
+    hole.lineTo(70, 50);
+    hole.lineTo(70, 70);
+    hole.lineTo(50, 70);
+    hole.lineTo(20, 50);
+    shape.holes = [hole];
 
-    return box;
+    var extrudeSettings = { amount: thickness, bevelEnabled: false };
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial( {color: 0x947b5c } );
+    var corner = new THREE.Mesh( geometry, material );
+
+    var angle = Math.PI * (0.5 * i);
+    var radius = halfEdgeLength * Math.sqrt(2);
+    corner.position.x = radius * Math.sin(angle + Math.PI / 4);
+    corner.position.y = radius * Math.cos(angle + Math.PI / 4);
+    corner.position.z = -thickness / 2;
+    corner.rotateZ(-angle);
+    return corner;
 }
 
 // FIXME: we definitely need some better polymorphism here
