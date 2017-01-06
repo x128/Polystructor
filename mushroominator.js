@@ -118,6 +118,7 @@ function createCorner(args, i, label)
     var halfWidth = args.width / 2;
     var holeOffset = args.holeOffset;
     var holeWidth = args.holeWidth;
+    var chamfer = args.chamfer;
 
     // Corner itself
     var shape = new THREE.Shape();
@@ -139,31 +140,22 @@ function createCorner(args, i, label)
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     var material = new THREE.MeshLambertMaterial( {color: 0x947b5c } );
     var corner = new THREE.Mesh( geometry, material );
-
-    var chamfer = args.chamfer;
-    var pzTolerance = 10;
-
-    var pzShape = new THREE.Shape();
-    pzShape.moveTo(-thickness / 2, -chamfer);
-    pzShape.lineTo(0, 0);
-    pzShape.lineTo(thickness / 2, -chamfer);
-    pzShape.lineTo(thickness / 2 + pzTolerance, -chamfer);
-    pzShape.lineTo(thickness / 2 + pzTolerance, pzTolerance);
-    pzShape.lineTo(-thickness / 2 - pzTolerance, pzTolerance);
-    pzShape.lineTo(-thickness / 2 - pzTolerance, -chamfer);
-
-    var pzExtrudeSettings = { amount: size, bevelEnabled: false };
-    var pzGeometry = new THREE.ExtrudeGeometry(pzShape, pzExtrudeSettings);
-    var pzMaterial = new THREE.MeshBasicMaterial( {color: 0xFF0000 } );
-    var polyzapilivatel = new THREE.Mesh(pzGeometry, pzMaterial);
-
     corner.position.z = -thickness / 2;
-    polyzapilivatel.rotateX(Math.PI);
-    polyzapilivatel.rotateY(Math.PI / 2);
-
-    var polyzapilivatelBSP = new ThreeBSP(polyzapilivatel);
     var cornerBSP = new ThreeBSP(corner);
+
+    var polyzapilivatel = createPolyzapilivatel(thickness, chamfer, size, 10);
+
+    // Pass 1
+    polyzapilivatel.rotateY(Math.PI / 2);
+    polyzapilivatel.position.y = size;
+    var polyzapilivatelBSP = new ThreeBSP(polyzapilivatel);
     var resultBSP = cornerBSP.subtract(polyzapilivatelBSP);
+
+    // Pass 2
+    polyzapilivatel.rotateX(Math.PI / 2);
+    polyzapilivatel.position.x = size;
+    polyzapilivatelBSP = new ThreeBSP(polyzapilivatel);
+    resultBSP = resultBSP.subtract(polyzapilivatelBSP);
 
     corner = resultBSP.toMesh();
     corner.geometry.computeVertexNormals();
@@ -175,6 +167,25 @@ function createCorner(args, i, label)
     corner.position.y = radius * Math.cos(angle + Math.PI / 4);
     corner.rotateZ(-angle);
     return corner;
+}
+
+function createPolyzapilivatel(thickness, chamfer, length, tolerance)
+{
+    var shape = new THREE.Shape();
+    shape.moveTo(-thickness / 2, -chamfer);
+    shape.lineTo(0, 0);
+    shape.lineTo(thickness / 2, -chamfer);
+    shape.lineTo(thickness / 2 + tolerance, -chamfer);
+    shape.lineTo(thickness / 2 + tolerance, tolerance);
+    shape.lineTo(-thickness / 2 - tolerance, tolerance);
+    shape.lineTo(-thickness / 2 - tolerance, -chamfer);
+
+    var extrudeSettings = { amount: length, bevelEnabled: false };
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial( {color: 0xFF0000 } );
+    var polyzapilivatel = new THREE.Mesh(geometry, material);
+
+    return polyzapilivatel;
 }
 
 // FIXME: we definitely need some better polymorphism here

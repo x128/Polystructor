@@ -68,9 +68,9 @@ function create(options)
 
 
     // position and point the camera to the center of the scene
-    m_camera.position.x = -300;
-    m_camera.position.y = 100;
-    m_camera.position.z = 300;
+    m_camera.position.x = -500;
+    m_camera.position.y = -300;
+    m_camera.position.z = 500;
 
     var pos = m_scene.position;
     pos.y += 13;
