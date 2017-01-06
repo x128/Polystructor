@@ -1,4 +1,5 @@
 var Utils = require('utils');
+var ThreeCSG = require('lib/ThreeCSG/ThreeCSG.js');
 
 var DetailType = {
     Square : 'square'
@@ -59,19 +60,18 @@ function createMushroomBox(args) {
     var halfWidth = args.width / 2 - args.chamfer;
 
     var shape = new THREE.Shape();
-    shape.moveTo(halfEdgeLength, halfWidth);
-    shape.moveTo(halfEdgeLength, halfEdgeLength);
-    shape.lineTo(halfWidth, halfEdgeLength);
-    shape.lineTo(halfWidth, -halfEdgeLength);
-    shape.lineTo(halfEdgeLength, -halfEdgeLength);
-    shape.lineTo(halfEdgeLength, -halfWidth);
+    shape.moveTo( halfEdgeLength,  halfWidth);
+    shape.moveTo( halfEdgeLength,  halfEdgeLength);
+    shape.lineTo( halfWidth,       halfEdgeLength);
+    shape.lineTo( halfWidth,      -halfEdgeLength);
+    shape.lineTo( halfEdgeLength, -halfEdgeLength);
+    shape.lineTo( halfEdgeLength, -halfWidth);
     shape.lineTo(-halfEdgeLength, -halfWidth);
     shape.lineTo(-halfEdgeLength, -halfEdgeLength);
-    shape.lineTo(-halfWidth, -halfEdgeLength);
-    shape.lineTo(-halfWidth, halfEdgeLength);
-    shape.lineTo(-halfEdgeLength, halfEdgeLength);
-    shape.lineTo(-halfEdgeLength, halfWidth);
-    shape.lineTo(halfEdgeLength, halfWidth);
+    shape.lineTo(-halfWidth,      -halfEdgeLength);
+    shape.lineTo(-halfWidth,       halfEdgeLength);
+    shape.lineTo(-halfEdgeLength,  halfEdgeLength);
+    shape.lineTo(-halfEdgeLength,  halfWidth);
 
     var extrudeSettings = { amount: thickness, bevelEnabled: false };
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -118,14 +118,13 @@ function createCorner(args, i, label)
     var halfWidth = args.width / 2;
     var holeOffset = args.holeOffset;
     var holeWidth = args.holeWidth;
-    var cornerSize = args.cornerSize;
 
+    // Corner itself
     var shape = new THREE.Shape();
     shape.moveTo(0, 0);
-    shape.lineTo(0, cornerSize);
-    shape.lineTo(cornerSize, cornerSize);
-    shape.lineTo(cornerSize, 0);
-    shape.lineTo(0, 0);
+    shape.lineTo(0, size);
+    shape.lineTo(size, size);
+    shape.lineTo(size, 0);
 
     var hole = new THREE.Path();
     hole.moveTo(20, 50);
@@ -138,14 +137,42 @@ function createCorner(args, i, label)
 
     var extrudeSettings = { amount: thickness, bevelEnabled: false };
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var material = new THREE.MeshBasicMaterial( {color: 0x947b5c } );
+    var material = new THREE.MeshLambertMaterial( {color: 0x947b5c } );
     var corner = new THREE.Mesh( geometry, material );
 
+    var chamfer = args.chamfer;
+    var pzTolerance = 10;
+
+    var pzShape = new THREE.Shape();
+    pzShape.moveTo(-thickness / 2, -chamfer);
+    pzShape.lineTo(0, 0);
+    pzShape.lineTo(thickness / 2, -chamfer);
+    pzShape.lineTo(thickness / 2 + pzTolerance, -chamfer);
+    pzShape.lineTo(thickness / 2 + pzTolerance, pzTolerance);
+    pzShape.lineTo(-thickness / 2 - pzTolerance, pzTolerance);
+    pzShape.lineTo(-thickness / 2 - pzTolerance, -chamfer);
+
+    var pzExtrudeSettings = { amount: size, bevelEnabled: false };
+    var pzGeometry = new THREE.ExtrudeGeometry(pzShape, pzExtrudeSettings);
+    var pzMaterial = new THREE.MeshBasicMaterial( {color: 0xFF0000 } );
+    var polyzapilivatel = new THREE.Mesh(pzGeometry, pzMaterial);
+
+    corner.position.z = -thickness / 2;
+    polyzapilivatel.rotateX(Math.PI);
+    polyzapilivatel.rotateY(Math.PI / 2);
+
+    var polyzapilivatelBSP = new ThreeBSP(polyzapilivatel);
+    var cornerBSP = new ThreeBSP(corner);
+    var resultBSP = cornerBSP.subtract(polyzapilivatelBSP);
+
+    corner = resultBSP.toMesh();
+    corner.geometry.computeVertexNormals();
+
+    // Rotate & Position
     var angle = Math.PI * (0.5 * i);
     var radius = halfEdgeLength * Math.sqrt(2);
     corner.position.x = radius * Math.sin(angle + Math.PI / 4);
     corner.position.y = radius * Math.cos(angle + Math.PI / 4);
-    corner.position.z = -thickness / 2;
     corner.rotateZ(-angle);
     return corner;
 }
