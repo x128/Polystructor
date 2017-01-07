@@ -122,6 +122,8 @@ function performUnderCursor(callbackUnderCursor, callbackForOthers) {
                 callbackForOthers(o);
         });
         callbackUnderCursor(smth.object);
+    } else {
+        m_selectableObjects.forEach(callbackForOthers);
     }
 }
 
