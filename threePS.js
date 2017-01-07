@@ -20,13 +20,13 @@ var detail = mushroominator.bake({
 var pos = new THREE.Vector3(0, 0, 0);
 view.addDetail(detail, pos /*, orientation */);
 
-var detail2 = mushroominator.bake({
-    type : mushroominator.DetailType.Square,
-    width : 5,
-    depth : 2
-});
-var pos2 = new THREE.Vector3(0, 10, 0);
+// var detail2 = mushroominator.bake({
+//     type : mushroominator.DetailType.Square,
+//     width : 5,
+//     depth : 2
+// });
+// var pos2 = new THREE.Vector3(0, 10, 0);
 //view.addDetail(detail2, pos2 /*, orientation */);
-detail2.rotateY(Math.PI / 3);
+// detail2.rotateY(Math.PI / 3);
 
 view.startRendering();
