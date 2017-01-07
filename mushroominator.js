@@ -2,16 +2,23 @@ var Utils = require('utils');
 var ThreeCSG = require('lib/ThreeCSG/ThreeCSG.js');
 var PartsFactory = require('PartsFactory');
 
-var DetailType = {
-    Square : 'square'
+var DetailGeometry = {
+    Square : {
+        width : 450,
+        depth : 20,
+        cornerSize : 112.5,
+        chamfer : 22.5,
+        holeOffset : 25,
+        holeWidth : 10
+    }
 };
 
-function bake(args) {
-    switch (args.type) {
-        case DetailType.Square:
-            return bakeSquare(args);
+function bake(what) {
+    switch (what) {
+        case DetailGeometry.Square:
+            return bakeSquare(what);
         default:
-            console.error('[Mushroominator::bake] unknown detail requested');
+            console.error('[Mushroominator::bake] what?');
     }
 }
 
@@ -179,4 +186,4 @@ function createPolyzapilivatel(thickness, chamfer, length, tolerance) {
 }
 
 exports.bake = bake;
-exports.DetailType = DetailType;
+exports.DetailGeometry = DetailGeometry;

@@ -63,9 +63,9 @@ function create(options) {
 
 
     // position and point the camera to the center of the scene
-    m_camera.position.x = -500;
-    m_camera.position.y = -300;
-    m_camera.position.z = 500;
+    m_camera.position.x = -1000;
+    m_camera.position.y = 500;
+    m_camera.position.z = 2500;
 
     var pos = m_scene.position;
     pos.y += 13;
@@ -168,7 +168,7 @@ function stopRendering() {
     window.cancelAnimationFrame(m_animationFrameRequest);
 }
 
-function addDetail(detail, pos) {
+function addObject(detail, pos) {
     m_scene.add(detail);
     detail.position.x = pos.x;
     detail.position.y = pos.y;
@@ -186,4 +186,4 @@ exports.ViewOptions = ViewOptions;
 exports.create = create;
 exports.startRendering = startRendering;
 exports.stopRendering = stopRendering;
-exports.addDetail = addDetail;
+exports.addObject = addObject;
