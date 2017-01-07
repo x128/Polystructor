@@ -8,31 +8,27 @@ var m_options, m_size;
 var m_animationFrameRequest;
 var m_selectableObjects;
 
-function updateViewSize()
-{
-    if (m_options & ViewOptions.FullScreen)
-    {
+function updateViewSize() {
+    if (m_options & ViewOptions.FullScreen) {
         m_size = {
             width : window.innerWidth,
             height : window.innerHeight,
             aspectRatio : window.innerWidth / window.innerHeight
         };
-    }
-    else
+    } else {
         console.error('[view::updateViewSize] unknown options');
+    }
 
     if (m_renderer)
         m_renderer.setSize(m_size.width, m_size.height);
 
-    if (m_camera)
-    {
+    if (m_camera) {
         m_camera.aspect = m_size.aspectRatio;
         m_camera.updateProjectionMatrix();
     }
 }
 
-function create(options)
-{
+function create(options) {
     m_options = options;
 
     updateViewSize();
@@ -47,8 +43,7 @@ function create(options)
     m_renderer.shadowMap.enabled = true;
 
 
-    if (m_options & ViewOptions.ShowAxes)
-    {
+    if (m_options & ViewOptions.ShowAxes) {
         var axes = new THREE.AxisHelper(20);
         m_scene.add(axes);
     }
@@ -93,14 +88,13 @@ function create(options)
     glDiv.appendChild(m_renderer.domElement);
 
     var ambientLight = new THREE.AmbientLight(0x0c0c0c);
-//        ambientLight.castShadow = true;
+    // ambientLight.castShadow = true;
     m_scene.add(ambientLight);
 
     createControls();
 }
 
-function createControls()
-{
+function createControls() {
     setWindowResizeHandler(updateViewSize);
 
     m_orbitControls = new THREE.OrbitControls(m_camera, m_renderer.domElement);
@@ -111,8 +105,7 @@ function createControls()
     document.addEventListener('mousemove', onMouseMove);
 }
 
-function objectUnderCursor()
-{
+function objectUnderCursor() {
     var x = (event.clientX / m_size.width) * 2 - 1;
     var y = -(event.clientY / m_size.height) * 2 + 1;
     var mouse = new THREE.Vector2(x, y);
@@ -121,47 +114,33 @@ function objectUnderCursor()
     return intersections.length ? intersections[0] : null;
 }
 
-function performUnderCursor(callbackThis, callbackOthers)
-{
+function performUnderCursor(callbackUnderCursor, callbackForOthers) {
     var smth = objectUnderCursor();
-    if (smth && smth.object && smth.object.selectable)
-    {
+    if (smth && smth.object && smth.object.selectable) {
         m_selectableObjects.forEach(function(o) {
             if (o != smth.object)
-                callbackOthers(o);
+                callbackForOthers(o);
         });
-        callbackThis(smth.object);
+        callbackUnderCursor(smth.object);
     }
 }
 
-function onMouseMove()
-{
+function onMouseMove() {
     performUnderCursor(
-        function(obj) { obj.highlight() },
+        function(obj) { obj.highlight(); },
         function(obj) { if (obj.highlighted) obj.fadetoblack(); }
     );
 }
 
-function onMouseDown()
-{
+function onMouseDown() {
     // TODO: mouseDown + mouseUp not far from each other
     performUnderCursor(
-        function(obj) { obj.select() },
+        function(obj) { obj.select(); },
         function(obj) { if (obj.selected) obj.deselect(); }
     );
-return;
-    var smth = objectUnderCursor();
-    if (smth && smth.object && smth.object.selectable)
-    {
-        m_selectableObjects.forEach(function(o) {
-            if (o != smth.object && o.selected) o.deselect();
-        });
-        smth.object.select();
-    }
 }
 
-function setWindowResizeHandler(callback)
-{
+function setWindowResizeHandler(callback) {
     window.addEventListener('resize', callback, false);
     return {
         stop : function() {
@@ -170,8 +149,7 @@ function setWindowResizeHandler(callback)
     };
 }
 
-function renderLoop()
-{
+function renderLoop() {
     m_camera.position.x += 0.01;
     var pos = m_scene.position;
     m_camera.lookAt(pos);
@@ -180,18 +158,15 @@ function renderLoop()
     m_renderer.render(m_scene, m_camera);
 }
 
-function startRendering()
-{
+function startRendering() {
     renderLoop();
 }
 
-function stopRendering()
-{
+function stopRendering() {
     window.cancelAnimationFrame(m_animationFrameRequest);
 }
 
-function addDetail(detail, pos)
-{
+function addDetail(detail, pos) {
     m_scene.add(detail);
     detail.position.x = pos.x;
     detail.position.y = pos.y;

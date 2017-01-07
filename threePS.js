@@ -6,10 +6,10 @@ require('utils');
 var view = require('view');
 view.create(view.ViewOptions.FullScreen | view.ViewOptions.ShowAxes);
 
-var mushroominator = require('mushroominator');
+var Mushroominator = require('Mushroominator');
 
-var detail = mushroominator.bake({
-    type : mushroominator.DetailType.Square,
+var detail = Mushroominator.bake({
+    type : Mushroominator.DetailType.Square,
     width : 450,
     depth : 20,
     cornerSize : 112.5,
@@ -20,8 +20,8 @@ var detail = mushroominator.bake({
 var pos = new THREE.Vector3(0, 0, 0);
 view.addDetail(detail, pos /*, orientation */);
 
-// var detail2 = mushroominator.bake({
-//     type : mushroominator.DetailType.Square,
+// var detail2 = Mushroominator.bake({
+//     type : Mushroominator.DetailType.Square,
 //     width : 5,
 //     depth : 2
 // });

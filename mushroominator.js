@@ -6,22 +6,16 @@ var DetailType = {
     Square : 'square'
 };
 
-function bake(args)
-{
-    switch (args.type)
-    {
+function bake(args) {
+    switch (args.type) {
         case DetailType.Square:
             return bakeSquare(args);
         default:
-            console.error('[mushroominator::bake] unknown detail requested');
+            console.error('[Mushroominator::bake] unknown detail requested');
     }
 }
 
-function bakeSquare(args)
-{
-    var width = args.width;
-    var depth = args.depth;
-
+function bakeSquare(args) {
     var detail = new THREE.Object3D();
     detail.selectEdge = function(arg) {
         console.log(arg);
@@ -42,8 +36,7 @@ function bakeSquare(args)
         createEdge(args, 3, 'W')];
 
     detail.add(mushroomBox);
-    for (var i = 0; i < 4; i++)
-    {
+    for (var i = 0; i < 4; i++) {
         detail.add(corners[i]);
         detail.add(edges[i]);
     }
@@ -168,8 +161,7 @@ function createCorner(args, i, label)
     return corner;
 }
 
-function createPolyzapilivatel(thickness, chamfer, length, tolerance)
-{
+function createPolyzapilivatel(thickness, chamfer, length, tolerance) {
     var shape = new THREE.Shape();
     shape.moveTo(-thickness / 2, -chamfer);
     shape.lineTo(0, 0);
