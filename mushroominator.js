@@ -1,5 +1,6 @@
 var Utils = require('utils');
 var ThreeCSG = require('lib/ThreeCSG/ThreeCSG.js');
+var PartsFactory = require('PartsFactory');
 
 var DetailType = {
     Square : 'square'
@@ -75,8 +76,7 @@ function createMushroomBox(args) {
 
     var extrudeSettings = { amount: thickness, bevelEnabled: false };
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var material = new THREE.MeshBasicMaterial({color: 0xb6afa5 });
-    var mushroom = new THREE.Mesh(geometry, material);
+    var mushroom = new PartsFactory.freeform(geometry, 0xb6afa5, false);
 
     mushroom.position.z = -thickness / 2;
 
@@ -97,8 +97,7 @@ function createEdge(args, i, label)
 
     var extrudeSettings = { amount: edgeLength, bevelEnabled: false };
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var material = new THREE.MeshBasicMaterial( {color: 0x978F82 } );
-    var edge = new THREE.Mesh( geometry, material );
+    var edge = new PartsFactory.freeform(geometry, 0x978F82, true, 0xFF0000, 0xd2cbc0);
 
     var radius = args.width / 2;
     var angle = i * Math.PI / 2;
@@ -156,15 +155,15 @@ function createCorner(args, i, label)
     polyzapilivatelBSP = new ThreeBSP(polyzapilivatel);
     resultBSP = resultBSP.subtract(polyzapilivatelBSP);
 
-    var material = new THREE.MeshLambertMaterial( { color: 0x947b5c } );
-    corner = resultBSP.toMesh(material);
-    corner.geometry.computeFlatVertexNormals();
+    geometry = resultBSP.toGeometry();
+    corner = new PartsFactory.freeform(geometry, 0x947b5c, true, 0xFF0000, 0xbea689);
 
     // Rotate & Position
-    var angle = Math.PI * (0.5 * i);
+    var angle = i * Math.PI / 2;
     var radius = halfEdgeLength * Math.sqrt(2);
     corner.position.x = radius * Math.sin(angle + Math.PI / 4);
     corner.position.y = radius * Math.cos(angle + Math.PI / 4);
+    corner.position.z = -thickness / 2;
     corner.rotateZ(-angle);
     return corner;
 }
@@ -185,51 +184,6 @@ function createPolyzapilivatel(thickness, chamfer, length, tolerance)
     var polyzapilivatel = new THREE.Mesh(geometry);
 
     return polyzapilivatel;
-}
-
-// FIXME: we definitely need some better polymorphism here
-//Box.prototype = new THREE.Mesh();
-//Box.prototype.constructor = Box;
-function Box(width, height, depth, color, selectable, selectionColor, highlightColor)
-{
-    var geometry = new THREE.BoxGeometry(width, height, depth);
-    var material = new THREE.MeshLambertMaterial({ color : color });
-    var box = new THREE.Mesh(geometry, material);
-
-    box.selectable = selectable;
-    if (selectable)
-    {
-        box.selected = false;
-        box.originalMaterial = material;
-        box.selectionMaterial = new THREE.MeshLambertMaterial({ color : selectionColor });
-
-        if (!highlightColor)
-            highlightColor = Utils.averageColor(color, selectionColor);
-        box.highlightMaterial = new THREE.MeshLambertMaterial({ color : highlightColor });
-
-        box.select = function() {
-            this.material = this.selectionMaterial;
-            this.selected = true;
-        };
-        box.deselect = function() {
-            this.material = this.originalMaterial;
-            this.selected = false;
-        };
-
-        box.highlight = function() {
-            this.material = this.selected ? this.selectionMaterial : this.highlightMaterial;
-            this.highlighted = true;
-        };
-        box.fadetoblack = function() {
-            this.material = this.selected ? this.selectionMaterial : this.originalMaterial;
-            this.highlighted = false;
-        };
-    }
-
-    box.castShadow = true;
-    //box.receiveShadow = true; TODO
-
-    return box;
 }
 
 exports.bake = bake;
