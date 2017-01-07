@@ -61,7 +61,7 @@ function createMushroomBox(args) {
 
     var shape = new THREE.Shape();
     shape.moveTo( halfEdgeLength,  halfWidth);
-    shape.moveTo( halfEdgeLength,  halfEdgeLength);
+    shape.lineTo( halfEdgeLength,  halfEdgeLength);
     shape.lineTo( halfWidth,       halfEdgeLength);
     shape.lineTo( halfWidth,      -halfEdgeLength);
     shape.lineTo( halfEdgeLength, -halfEdgeLength);
@@ -75,8 +75,8 @@ function createMushroomBox(args) {
 
     var extrudeSettings = { amount: thickness, bevelEnabled: false };
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var material = new THREE.MeshBasicMaterial( {color: 0xb6afa5 } );
-    var mushroom = new THREE.Mesh( geometry, material );
+    var material = new THREE.MeshBasicMaterial({color: 0xb6afa5 });
+    var mushroom = new THREE.Mesh(geometry, material);
 
     mushroom.position.z = -thickness / 2;
 
@@ -138,8 +138,7 @@ function createCorner(args, i, label)
 
     var extrudeSettings = { amount: thickness, bevelEnabled: false };
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var material = new THREE.MeshLambertMaterial( {color: 0x947b5c } );
-    var corner = new THREE.Mesh( geometry, material );
+    var corner = new THREE.Mesh(geometry);
     corner.position.z = -thickness / 2;
     var cornerBSP = new ThreeBSP(corner);
 
@@ -157,8 +156,9 @@ function createCorner(args, i, label)
     polyzapilivatelBSP = new ThreeBSP(polyzapilivatel);
     resultBSP = resultBSP.subtract(polyzapilivatelBSP);
 
-    corner = resultBSP.toMesh();
-    corner.geometry.computeVertexNormals();
+    var material = new THREE.MeshLambertMaterial( { color: 0x947b5c } );
+    corner = resultBSP.toMesh(material);
+    corner.geometry.computeFlatVertexNormals();
 
     // Rotate & Position
     var angle = Math.PI * (0.5 * i);
@@ -182,8 +182,7 @@ function createPolyzapilivatel(thickness, chamfer, length, tolerance)
 
     var extrudeSettings = { amount: length, bevelEnabled: false };
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var material = new THREE.MeshBasicMaterial( {color: 0xFF0000 } );
-    var polyzapilivatel = new THREE.Mesh(geometry, material);
+    var polyzapilivatel = new THREE.Mesh(geometry);
 
     return polyzapilivatel;
 }
