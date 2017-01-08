@@ -13,20 +13,17 @@ var DetailGeometry = {
     }
 };
 
-function bake(what) {
+function bake(what, tmpCallbackOnSelected) {
     switch (what) {
         case DetailGeometry.Square:
-            return bakeSquare(what);
+            return bakeSquare(what, tmpCallbackOnSelected);
         default:
             console.error('[Mushroominator::bake] what?');
     }
 }
 
-function bakeSquare(args) {
+function bakeSquare(args, tmpCallbackOnSelected) {
     var detail = new THREE.Object3D();
-    detail.selectEdge = function(arg) {
-        console.log(arg);
-    };
 
     var mushroomBox = createMushroomBox(args);
 
@@ -41,6 +38,10 @@ function bakeSquare(args) {
         createEdge(args, 1, 'E'),
         createEdge(args, 2, 'S'),
         createEdge(args, 3, 'W')];
+
+    edges.forEach(function (edge) {
+        edge.onSelected = tmpCallbackOnSelected;
+    });
 
     detail.add(mushroomBox);
     for (var i = 0; i < 4; i++) {
@@ -126,13 +127,14 @@ function createCorner(args, i, label)
     shape.lineTo(size, size);
     shape.lineTo(size, 0);
 
+    var sqrt12 = Math.SQRT1_2;
+
     var hole = new THREE.Path();
-    hole.moveTo(20, 50);
-    hole.lineTo(50, 20);
-    hole.lineTo(70, 20);
-    hole.lineTo(70, 40);
-    hole.lineTo(40, 70);
-    hole.lineTo(20, 70);
+    hole.moveTo(25-5*sqrt12, 65-5*sqrt12);
+    hole.lineTo(65-5*sqrt12, 25-5*sqrt12);
+    hole.absarc(65, 25,5,Math.PI*5/4,Math.PI/4,false);
+    hole.moveTo(25+5*sqrt12, 65+5*sqrt12);
+    hole.absarc(25, 65,5,Math.PI/4,Math.PI*5/4,false);
     shape.holes = [hole];
 
     var extrudeSettings = { amount: thickness, bevelEnabled: false };

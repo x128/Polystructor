@@ -3,22 +3,26 @@
 //Part.prototype.constructor = Part;
 
 function freeform(geometry, color, selectable, selectionColor, highlightColor) {
-    var material = new THREE.MeshLambertMaterial({ color : color });
+    var material = new THREE.MeshPhongMaterial({ color : color });
     var part = new THREE.Mesh(geometry, material);
-
+    part.onSelected = false;
+    
     part.selectable = selectable;
     if (selectable) {
         part.selected = false;
         part.originalMaterial = material;
-        part.selectionMaterial = new THREE.MeshLambertMaterial({ color : selectionColor });
+        part.selectionMaterial = new THREE.MeshPhongMaterial({ color : selectionColor });
 
         if (!highlightColor)
             highlightColor = Utils.averageColor(color, selectionColor);
-        part.highlightMaterial = new THREE.MeshLambertMaterial({ color : highlightColor });
+        part.highlightMaterial = new THREE.MeshPhongMaterial({ color : highlightColor });
 
         part.select = function() {
             this.material = this.selectionMaterial;
             this.selected = true;
+            console.log(this);
+            if (part.onSelected)
+                part.onSelected();
         };
         part.deselect = function() {
             this.material = this.originalMaterial;
@@ -36,7 +40,7 @@ function freeform(geometry, color, selectable, selectionColor, highlightColor) {
     }
 
     part.castShadow = true;
-    // part.receiveShadow = true; // TODO-2016
+    part.receiveShadow = true; // TODO-2016
 
     return part;
 }
