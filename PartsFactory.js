@@ -1,15 +1,24 @@
-// FIXME-2016: do we need some better polymorphism here?
-//Part.prototype = new THREE.Mesh();
-//Part.prototype.constructor = Part;
+class Element {
+    init() {
+        console.log('hi');
+    }
+}
 
-function freeform(geometry, color, selectable, selectionColor, highlightColor) {
+class Corner extends Element {
+    init() {
+        super.init()
+        console.log('corner');
+    }
+}
+
+function freeform(geometry, color, isSelectable, selectionColor, highlightColor) {
     var material = new THREE.MeshPhongMaterial({ color : color });
     var part = new THREE.Mesh(geometry, material);
     part.onSelected = false;
     
-    part.selectable = selectable;
-    if (selectable) {
-        part.selected = false;
+    part.isSelectable = isSelectable;
+    if (isSelectable) {
+        part.isSelected = false;
         part.originalMaterial = material;
         part.selectionMaterial = new THREE.MeshPhongMaterial({ color : selectionColor });
 
@@ -19,22 +28,22 @@ function freeform(geometry, color, selectable, selectionColor, highlightColor) {
 
         part.select = function() {
             this.material = this.selectionMaterial;
-            this.selected = true;
+            this.isSelected = true;
             console.log(this);
             if (part.onSelected)
                 part.onSelected();
         };
         part.deselect = function() {
             this.material = this.originalMaterial;
-            this.selected = false;
+            this.isSelected = false;
         };
 
         part.highlight = function() {
-            this.material = this.selected ? this.selectionMaterial : this.highlightMaterial;
+            this.material = this.isSelected ? this.selectionMaterial : this.highlightMaterial;
             this.highlighted = true;
         };
         part.fadetoblack = function() {
-            this.material = this.selected ? this.selectionMaterial : this.originalMaterial;
+            this.material = this.isSelected ? this.selectionMaterial : this.originalMaterial;
             this.highlighted = false;
         };
     }
@@ -45,10 +54,12 @@ function freeform(geometry, color, selectable, selectionColor, highlightColor) {
     return part;
 }
 
-function box(width, height, depth, color, selectable, selectionColor, highlightColor) {
+function box(width, height, depth, color, isSelectable, selectionColor, highlightColor) {
     var geometry = new THREE.BoxGeometry(width, height, depth);
-    return freeform(geometry, color, selectable, selectionColor, highlightColor);
+    return freeform(geometry, color, isSelectable, selectionColor, highlightColor);
 }
 
 exports.freeform = freeform;
 exports.box = box;
+exports.Element = Element;
+exports.Corner = Corner;

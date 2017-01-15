@@ -2,6 +2,13 @@ var Utils = require('utils');
 var ThreeCSG = require('lib/ThreeCSG/ThreeCSG.js');
 var PartsFactory = require('PartsFactory');
 
+//var elt = new Element();
+//elt.init();
+var c = new PartsFactory.Corner();
+c.init();
+//var c = new Corner();
+//c.init();
+
 var DetailGeometry = {
     Square : {
         width : 450,

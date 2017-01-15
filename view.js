@@ -77,7 +77,7 @@ function create(options) {
     spotLight.position.set(0, 4500, 0);
     spotLight.castShadow = true;
     spotLight.angle = Math.PI / 4;
-    // m_scene.add(spotLight);
+    m_scene.add(spotLight);
 
     var sky = new THREE.AmbientLight(0xffffff, 0.1);
     m_scene.add(sky);
@@ -118,7 +118,7 @@ function objectUnderCursor() {
 
 function performUnderCursor(callbackUnderCursor, callbackForOthers) {
     var smth = objectUnderCursor();
-    if (smth && smth.object && smth.object.selectable) {
+    if (smth && smth.object && smth.object.isSelectable) {
         m_selectableObjects.forEach(function(o) {
             if (o != smth.object)
                 callbackForOthers(o);
@@ -160,7 +160,7 @@ function onMouseDown(event) {
             obj.select();
         },
         function (obj) {
-            if (obj.selected) obj.deselect();
+            if (obj.isSelected) obj.deselect();
         }
     );
 
