@@ -2,27 +2,73 @@ var Utils = require('utils');
 var ThreeCSG = require('lib/ThreeCSG/ThreeCSG.js');
 var PartsFactory = require('PartsFactory');
 
-var DetailGeometry = {
-    Square : {
+const PSElementType = {
+    Rectangle : "RECTANGLE",
+    Beam : "BEAM"
+};
+
+var PSElement = {
+    rectangle_540_540 : {
         width : 450,
         depth : 20,
         cornerSize : 112.5,
         chamfer : 22.5,
         holeOffset : 25,
         holeWidth : 10
+    },
+    beam_7_495 : {
+      length : 495,
+      width : 45,
+      holeCount : 7,
+      holeWidth : 8,
+      holeLength : 45
     }
 };
 
-function bake(what) {
-    switch (what) {
-        case DetailGeometry.Square:
-            return bakeSquare(what);
-        default:
-            console.error('[Mushroominator::bake] what?');
+function bake(type, element) {
+    switch (type) {
+      case PSElementType.Rectangle:
+          return bakeRectangle(element);
+      case PSElementType.Beam:
+          return bakeBeam(element);
+      default:
+          console.error('[Mushroominator::bake] what?');
     }
 }
 
-function bakeSquare(args) {
+function bakeRectangle(args) {
+    var detail = new THREE.Object3D();
+    detail.selectEdge = function(arg) {
+        console.log(arg);
+    };
+
+    var mushroomBox = createMushroomBox(args);
+
+    var corners = [
+        createCorner(args, 0, 'NE'),
+        createCorner(args, 1, 'SE'),
+        createCorner(args, 2, 'SW'),
+        createCorner(args, 3, 'NW')];
+
+    var edges = [
+        createEdge(args, 0, 'N'),
+        createEdge(args, 1, 'E'),
+        createEdge(args, 2, 'S'),
+        createEdge(args, 3, 'W')];
+
+    detail.add(mushroomBox);
+    for (var i = 0; i < 4; i++) {
+        detail.add(corners[i]);
+        detail.add(edges[i]);
+    }
+
+    detail.selectableObjects = corners;
+    detail.selectableObjects.extend(edges);
+
+    return detail;
+}
+
+function bakeRectangle(args) {
     var detail = new THREE.Object3D();
     detail.selectEdge = function(arg) {
         console.log(arg);
@@ -186,4 +232,5 @@ function createPolyzapilivatel(thickness, chamfer, length, tolerance) {
 }
 
 exports.bake = bake;
-exports.DetailGeometry = DetailGeometry;
+exports.PSElementType = PSElementType;
+exports.PSElement = PSElement;
