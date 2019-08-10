@@ -7,6 +7,9 @@ var Geometry = {
         { type : mushroominator.PSElementType.Rectangle, element : mushroominator.PSElement.rectangle_540_540, pos : [225, 0, 225], rotation : [0, 90, 0] },
         { type : mushroominator.PSElementType.Rectangle, element : mushroominator.PSElement.rectangle_540_540, pos : [-225, 0, 225], rotation : [0, 90, 0] },
         { type : mushroominator.PSElementType.Rectangle, element : mushroominator.PSElement.rectangle_540_540, pos : [0, 225, 225], rotation : [90, 0, 0] },
+    ],
+    Room : [
+      { type : mushroominator.PSElementType.Room, element : mushroominator.PSElement.room_5000_4000_3000, pos : [0, 0, 0], rotation : [0, 0, 0] }
     ]
 };
 
