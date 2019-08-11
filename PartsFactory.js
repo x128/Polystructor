@@ -19,6 +19,10 @@ function freeform(geometry, color, selectable, selectionColor, highlightColor) {
         part.select = function() {
             this.material = this.selectionMaterial;
             this.selected = true;
+
+            console.log(this.getWorldPosition(this.petrovich.position));
+            if (part.onSelected)
+                part.onSelected();
         };
         part.deselect = function() {
             this.material = this.originalMaterial;

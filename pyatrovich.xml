@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns1:configuration xmlns:ns1="somePS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<ps_element>
+		<element_type>beam_7_495</element_type>
+		<element_id>beam_7_495_1</element_id>
+		<x>0</x>
+		<y>0</y>
+		<z>0</z>
+		<rot_x>90</rot_x>
+		<rot_y>0</rot_y>
+		<rot_z>0</rot_z>
+	</ps_element>
+	<ps_element>
+		<element_type>beam_7_495</element_type>
+		<element_id>beam_7_495_2</element_id>
+		<x>46</x>
+		<y>405</y>
+		<z>0</z>
+		<rot_x>180</rot_x>
+		<rot_y>0</rot_y>
+		<rot_z>0</rot_z>
+	</ps_element>
+</ns1:configuration>
