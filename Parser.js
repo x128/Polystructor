@@ -1,4 +1,4 @@
-var mushroominator = require('mushroominator');
+var mushroominator = require('Mushroominator');
 
 function loadXMLDoc(fileName) {
   var xmlhttp = new XMLHttpRequest();
@@ -40,7 +40,18 @@ switch (element_type) {
       type = mushroominator.PSElementType.Beam;
       element = mushroominator.PSElement.beam_7_495;
       break;
-}
+
+          case "beam_1_90":
+            type = mushroominator.PSElementType.Beam;
+            element = mushroominator.PSElement.beam_1_90;
+            break;
+
+            case "beam_7_3_495_247":
+              type = mushroominator.PSElementType.LBeam;
+              element = mushroominator.PSElement.beam_7_3_495_247;
+              break;
+
+          }
 
 var threePSElement = {
    type : type,

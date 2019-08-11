@@ -1,38 +1,9 @@
 var Utils = require('utils');
 var ThreeCSG = require('lib/ThreeCSG/ThreeCSG.js');
 var PartsFactory = require('PartsFactory');
-var Colors = require('Colors').Colors;
-
-const PSElementType = {
-    Rectangle : "RECTANGLE",
-    Beam : "BEAM",
-    Room : "ROOM"
-};
-
-var PSElement = {
-    rectangle_540_540 : {
-        width : 450,
-        depth : 20,
-        cornerSize : 112.5,
-        chamfer : 22.5,
-        holeOffset : 25,
-        holeWidth : 10
-    },
-    beam_7_495 : {
-      length : 495,
-      width : 45,
-      holeCount : 7,
-      holeWidth : 8,
-      holeLength : 45,
-    },
-    room_5000_4000_3000 : {
-      length : 5000,
-      width : 4000,
-      height : 3000,
-    }
-};
-
-var room;
+const Colors = require('Colors').Colors;
+const PSElementType = require('PSElements').PSElementType;
+const PSElement = require('PSElements').PSElement;
 
 function bake(type, element) {
     switch (type) {
@@ -40,8 +11,10 @@ function bake(type, element) {
           return bakeRectangle(element);
       case PSElementType.Beam:
           return bakeBeam(element);
-      case PSElementType.Room:
-          return bakeRoom(element);
+      case PSElementType.LBeam:
+          return bakeLBeam(element);
+          case PSElementType.Room:
+              return bakeRoom(element);
       default:
           console.error('[Mushroominator::bake] what?');
     }
@@ -73,7 +46,10 @@ function bakeRectangle(args) {
         detail.add(edges[i]);
     }
 
-    detail.selectableObjects = corners;
+    detail.selectableObjects = [];
+    for (i = 0; i < corners.length; i++) {
+      detail.selectableObjects.push(corners[i].corner);
+    }
     detail.selectableObjects.extend(edges);
     detail.castShadow=true;
 
@@ -82,22 +58,36 @@ function bakeRectangle(args) {
 
 function bakeBeam(args) {
     var detail = new THREE.Object3D();
-
     var beamBase = createBeamBase(args);
-
     detail.add(beamBase);
+    return detail;
+}
 
+function bakeLBeam(args) {
+    var detail = new THREE.Object3D();
+    var argsCopy = args;
+    argsCopy.length = args.length1;
+      argsCopy.holeCount = args.holeCount1;
+        var beamY = createBeamBase(argsCopy);
+        beamY.translateY(args.length1 / 2 - args.width / 2);
+    argsCopy.length = args.length2 - args.width / 2;
+      argsCopy.holeCount = args.holeCount2;
+    var beamX = createBeamBase(argsCopy);
+    beamX.rotateZ(Math.PI / 2);
+    beamX.translateY(args.length2 / 2 - args.holeWidth);
+    detail.add(beamX);
+    detail.add(beamY);
     return detail;
 }
 
 function bakeRoom(args) {
   var roomGeometry = new THREE.BoxGeometry(args.length, args.width, args.height);
   roomGeometry.translate(0, 0, args.height / 2);
-  var wallMaterial = new THREE.MeshStandardMaterial({ color : Colors.sky, side: THREE.BackSide, roughness : 1 }); //MeshLambertMaterial
+  var wallMaterial = new THREE.MeshStandardMaterial({ color : Colors.sky, side: THREE.BackSide, roughness : 1 });
   var floorMaterial = new THREE.MeshStandardMaterial({ color : Colors.floor, side: THREE.BackSide, roughness : 1 });
   var roomMaterial = [wallMaterial, wallMaterial, wallMaterial, wallMaterial, wallMaterial, floorMaterial ];
-   room = new THREE.Mesh(roomGeometry, roomMaterial);
-   room.receiveShadow=true;
+  var room = new THREE.Mesh(roomGeometry, roomMaterial);
+   room.receiveShadow = true;
 
     return room;
 }
@@ -113,7 +103,54 @@ function createBeamBase(args) {
 
   var extrudeSettings = { depth: args.width, bevelEnabled: false };
   var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-  var beam = new PartsFactory.freeform(geometry, Colors.beam, false);
+  var beam = new THREE.Mesh(geometry);
+
+
+
+  var beamBSP = new ThreeBSP(beam);
+var resultBSP = beamBSP;
+
+  var slot = createSlot(args.holeWidth, args.holeLength + args.holeWidth, 0, args.width);
+
+
+var x = -args.length / 2 + args.width / 2 + args.holeLength / 2;
+
+var step = 0;
+if (args.holeCount > 1) {
+  step = args.holeLength + (args.length - args.holeCount * (args.holeLength) - (args.width - args.holeWidth)) / (args.holeCount - 1);
+}
+
+
+for (i = 0; i < args.holeCount; i++) {
+
+  // Pass 1
+  slot.position.x = 0;
+  slot.position.y = x;
+  slot.position.z = 0;
+  var slotBSP = new ThreeBSP(slot);
+  resultBSP = resultBSP.subtract(slotBSP);
+
+  // Pass 2
+  slot.rotateY(Math.PI / 2);
+  slot.position.x = -args.width / 2;
+  slot.position.y = x;
+  slot.position.z = args.width / 2;
+  var slotBSP = new ThreeBSP(slot);
+  resultBSP = resultBSP.subtract(slotBSP);
+
+slot.rotateY(-Math.PI / 2);
+
+x += step;
+
+}
+
+
+  geometry = resultBSP.toGeometry();
+
+
+
+
+  beam = new PartsFactory.freeform(geometry, Colors.beam, false);
 
   beam.position.z = -args.width / 2;
 
@@ -231,7 +268,20 @@ function createCorner(args, i, label)
     corner.position.y = radius * Math.cos(angle + Math.PI / 4);
     corner.position.z = -thickness / 2;
     corner.rotateZ(-angle);
-    return corner;
+
+var group = new THREE.Group();
+
+var point = new THREE.Object3D();
+point.position = corner.position;
+point.name = "petrovich";
+corner.petrovich = point;
+
+group.add(corner);
+group.add(point);
+group.petrovich = point;
+group.corner = corner;
+
+    return group;
 }
 
 function createPolyzapilivatel(thickness, chamfer, length, tolerance) {
@@ -249,6 +299,28 @@ function createPolyzapilivatel(thickness, chamfer, length, tolerance) {
     var polyzapilivatel = new THREE.Mesh(geometry);
 
     return polyzapilivatel;
+}
+
+function createSlot(width, length, offset, depth) {
+    var shape = new THREE.Shape();
+
+    var cornerSize = width / (1 + Math.SQRT2) / Math.SQRT2;
+
+    shape.moveTo(-width / 2 + cornerSize, length / 2);
+    shape.lineTo(width / 2 - cornerSize, length / 2);
+    shape.lineTo(width / 2, length / 2 - cornerSize);
+    shape.lineTo(width / 2, -length / 2 + cornerSize);
+    shape.lineTo(width / 2 - cornerSize, -length / 2);
+    shape.lineTo(-width / 2 + cornerSize, -length / 2);
+    shape.lineTo(-width / 2, -length / 2 + cornerSize);
+    shape.lineTo(-width / 2, length / 2 - cornerSize);
+    shape.lineTo(-width / 2 + cornerSize, length / 2);
+
+    var extrudeSettings = { depth: depth, bevelEnabled: false, bevelSegments: 1 };
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var slot = new THREE.Mesh(geometry);
+
+    return slot;
 }
 
 exports.bake = bake;

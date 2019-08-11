@@ -1,6 +1,5 @@
 var Colors = require('Colors').Colors;
-
-var mushroominator=require('mushroominator');
+var mushroominator = require('Mushroominator');
 
 var ViewOptions = {
     FullScreen : 0x1,
