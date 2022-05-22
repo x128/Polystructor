@@ -1,14 +1,11 @@
-//THREE = require('lib/three.js/build/three.min.js');
-THREE = require('lib/three.js/build/three.js');
-require('lib/three.js/examples/js/controls/OrbitControls.js');
-require('utils');
-require('Parser');
+import * as THREE from './lib/three.js/build/three.module.js';
+import * as view from './view.js';
+import * as assembler from './Assembler.js';
+import * as parser from './Parser.js';
 
-var view = require('View');
+const scene = new THREE.Scene();
+
 view.create(view.ViewOptions.FullScreen | view.ViewOptions.ShowAxes);
-
-var assembler = require('Assembler');
-var parser = require('Parser');
 
 var room = assembler.create(assembler.Geometry.Room);
 view.addObject(room, new THREE.Vector3());

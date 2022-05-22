@@ -1,5 +1,7 @@
-var Colors = require('Colors').Colors;
-var mushroominator = require('Mushroominator');
+import * as THREE from './lib/three.js/build/three.module.js';
+import { OrbitControls } from './lib/three.js/examples/jsm/controls/OrbitControls.js';
+import * as Colors from './Colors.js';
+import * as mushroominator from './mushroominator.js';
 
 var ViewOptions = {
     FullScreen : 0x1,
@@ -9,7 +11,7 @@ var ViewOptions = {
 var m_scene, m_camera, m_renderer, m_orbitControls, m_raycaster;
 var m_options, m_size;
 var m_animationFrameRequest;
-var m_selectableObjects;
+var m_selectableObjects = [];
 
 function updateViewSize() {
     if (m_options & ViewOptions.FullScreen) {
@@ -107,7 +109,7 @@ function create(options) {
 function createControls() {
     setWindowResizeHandler(updateViewSize);
 
-    m_orbitControls = new THREE.OrbitControls(m_camera, m_renderer.domElement);
+    m_orbitControls = new OrbitControls(m_camera, m_renderer.domElement);
 
     m_raycaster = new THREE.Raycaster();
 
@@ -184,16 +186,11 @@ function addObject(detail, pos) {
     detail.position.y = pos.y;
     detail.position.z = pos.z;
 
-    m_selectableObjects = m_selectableObjects || [];
-    m_selectableObjects.extend(detail.selectableObjects);
+    m_selectableObjects = m_selectableObjects.concat(detail.selectableObjects);
 }
 // + TODO:
 function recalcSelectableObjects()
 {
 }
 
-exports.ViewOptions = ViewOptions;
-exports.create = create;
-exports.startRendering = startRendering;
-exports.stopRendering = stopRendering;
-exports.addObject = addObject;
+export { ViewOptions, create, startRendering, stopRendering, addObject };

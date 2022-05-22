@@ -1,4 +1,5 @@
-var mushroominator = require('Mushroominator');
+import * as THREE from './lib/three.js/build/three.module.js';
+import * as mushroominator from './mushroominator.js';
 
 var Geometry = {
     Chair : [
@@ -38,5 +39,4 @@ function create(geometry) {
     return creation;
 }
 
-exports.Geometry = Geometry;
-exports.create = create;
+export { Geometry, create };

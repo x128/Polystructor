@@ -1,4 +1,4 @@
-var mushroominator = require('Mushroominator');
+import * as mushroominator from './mushroominator.js';
 
 function loadXMLDoc(fileName) {
   var xmlhttp = new XMLHttpRequest();
@@ -8,12 +8,12 @@ function loadXMLDoc(fileName) {
 }
 
 function parse(fileName) {
-  parser = new DOMParser();
-  var text = loadXMLDoc(fileName);
-  xmlDoc = parser.parseFromString(text, "text/xml");
-  var ps_elements = xmlDoc.getElementsByTagName("ps_element");
+  const parser = new DOMParser();
+  const text = loadXMLDoc(fileName);
+  const xmlDoc = parser.parseFromString(text, "text/xml");
+  const ps_elements = xmlDoc.getElementsByTagName("ps_element");
 
-parseTag = function(element, tagName) {
+const parseTag = function(element, tagName) {
   return element.getElementsByTagName(tagName)[0].innerHTML;
 }
 
@@ -66,4 +66,4 @@ threePSElements.push(threePSElement);
 return threePSElements;
 }
 
-exports.parse = parse;
+export { parse };

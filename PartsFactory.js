@@ -1,3 +1,6 @@
+import * as THREE from './lib/three.js/build/three.module.js';
+import CSG from './lib/three-csgmesh/three-csg.js';
+
 // FIXME-2016: do we need some better polymorphism here?
 //Part.prototype = new THREE.Mesh();
 //Part.prototype.constructor = Part;
@@ -20,7 +23,7 @@ function freeform(geometry, color, selectable, selectionColor, highlightColor) {
             this.material = this.selectionMaterial;
             this.selected = true;
 
-            console.log(this.getWorldPosition(this.petrovich.position));
+            // console.log(this.getWorldPosition(this.petrovich.position));
             if (part.onSelected)
                 part.onSelected();
         };
@@ -50,5 +53,4 @@ function box(width, height, depth, color, selectable, selectionColor, highlightC
     return freeform(geometry, color, selectable, selectionColor, highlightColor);
 }
 
-exports.freeform = freeform;
-exports.box = box;
+export { freeform, box };
