@@ -1,9 +1,9 @@
-var Utils = require('utils');
-var ThreeCSG = require('lib/ThreeCSG/ThreeCSG.js');
-var PartsFactory = require('PartsFactory');
-const Colors = require('Colors').Colors;
-const PSElementType = require('PSElements').PSElementType;
-const PSElement = require('PSElements').PSElement;
+import * as THREE from './lib/three.js/build/three.module.js';
+import * as Utils from './utils.js';
+import CSG from './lib/three-csgmesh/three-csg.js';
+import * as PartsFactory from './PartsFactory.js';
+import Colors from './Colors.js';
+import { PSElement, PSElementType } from './PSElements.js';
 
 function bake(type, element) {
     switch (type) {
@@ -48,7 +48,7 @@ function bakeRectangle(args) {
 
     detail.selectableObjects = [];
     for (i = 0; i < corners.length; i++) {
-      detail.selectableObjects.push(corners[i].corner);
+      detail.selectableObjects.push(corners[i]);
     }
     detail.selectableObjects.extend(edges);
     detail.castShadow=true;
@@ -107,7 +107,7 @@ function createBeamBase(args) {
 
 
 
-  var beamBSP = new ThreeBSP(beam);
+  var beamBSP = CSG.fromMesh(beam);
 var resultBSP = beamBSP;
 
   var slot = createSlot(args.holeWidth, args.holeLength + args.holeWidth, 0, args.width);
@@ -121,13 +121,13 @@ if (args.holeCount > 1) {
 }
 
 
-for (i = 0; i < args.holeCount; i++) {
+for (var i = 0; i < args.holeCount; i++) {
 
   // Pass 1
   slot.position.x = 0;
   slot.position.y = x;
   slot.position.z = 0;
-  var slotBSP = new ThreeBSP(slot);
+  var slotBSP = CSG.fromMesh(slot);
   resultBSP = resultBSP.subtract(slotBSP);
 
   // Pass 2
@@ -135,7 +135,7 @@ for (i = 0; i < args.holeCount; i++) {
   slot.position.x = -args.width / 2;
   slot.position.y = x;
   slot.position.z = args.width / 2;
-  var slotBSP = new ThreeBSP(slot);
+  var slotBSP = CSG.fromMesh(slot);
   resultBSP = resultBSP.subtract(slotBSP);
 
 slot.rotateY(-Math.PI / 2);
@@ -145,7 +145,7 @@ x += step;
 }
 
 
-  geometry = resultBSP.toGeometry();
+  geometry = CSG.toGeometry(resultBSP);
 
 
 
@@ -242,23 +242,23 @@ function createCorner(args, i, label)
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     var corner = new THREE.Mesh(geometry);
     corner.position.z = -thickness / 2;
-    var cornerBSP = new ThreeBSP(corner);
+    var cornerBSP = CSG.fromMesh(corner);
 
     var polyzapilivatel = createPolyzapilivatel(thickness, chamfer, size, 10);
 
     // Pass 1
     polyzapilivatel.rotateY(Math.PI / 2);
     polyzapilivatel.position.y = size;
-    var polyzapilivatelBSP = new ThreeBSP(polyzapilivatel);
+    var polyzapilivatelBSP = CSG.fromMesh(polyzapilivatel);
     var resultBSP = cornerBSP.subtract(polyzapilivatelBSP);
 
     // Pass 2
     polyzapilivatel.rotateX(Math.PI / 2);
     polyzapilivatel.position.x = size;
-    polyzapilivatelBSP = new ThreeBSP(polyzapilivatel);
+    polyzapilivatelBSP = CSG.fromMesh(polyzapilivatel);
     resultBSP = resultBSP.subtract(polyzapilivatelBSP);
 
-    geometry = resultBSP.toGeometry();
+    geometry = CSG.toGeometry(resultBSP);
     corner = new PartsFactory.freeform(geometry, 0x947b5c, true, 0xFF0000, 0xbea689);
 
     // Rotate & Position
@@ -269,19 +269,7 @@ function createCorner(args, i, label)
     corner.position.z = -thickness / 2;
     corner.rotateZ(-angle);
 
-var group = new THREE.Group();
-
-var point = new THREE.Object3D();
-point.position = corner.position;
-point.name = "petrovich";
-corner.petrovich = point;
-
-group.add(corner);
-group.add(point);
-group.petrovich = point;
-group.corner = corner;
-
-    return group;
+    return corner;
 }
 
 function createPolyzapilivatel(thickness, chamfer, length, tolerance) {
@@ -323,6 +311,4 @@ function createSlot(width, length, offset, depth) {
     return slot;
 }
 
-exports.bake = bake;
-exports.PSElementType = PSElementType;
-exports.PSElement = PSElement;
+export { bake, PSElementType, PSElement };

@@ -44,5 +44,4 @@ const PSElement = {
     }
 };
 
-exports.PSElementType = PSElementType;
-exports.PSElement = PSElement;
+export { PSElement, PSElementType };

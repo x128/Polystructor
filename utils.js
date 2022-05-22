@@ -5,7 +5,7 @@ Array.prototype.extend = function (otherArray) {
         otherArray.forEach(function(v) {this.push(v)}, this);
 };
 
-exports.averageColor = function(c1, c2) {
+const averageColor = function(c1, c2) {
     var c1r = Math.floor(c1 / 0x10000);
     var c1g = Math.floor(c1 / 0x100) % 0x100;
     var c1b = c1 % 256;
@@ -19,3 +19,5 @@ exports.averageColor = function(c1, c2) {
 
     return r * 0x10000 + g * 0x100 + b;
 };
+
+export { averageColor };

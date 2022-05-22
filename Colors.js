@@ -7,4 +7,4 @@ const Colors = {
   beam : 0x333333,
 }
 
-exports.Colors = Colors;
+export default Colors;
