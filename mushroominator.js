@@ -92,71 +92,6 @@ function bakeRoom(args) {
     return room;
 }
 
-function createBeamBase(args) {
-  var shape = new THREE.Shape();
-
-  shape.moveTo(args.width / 2, (args.length - args.width) / 2);
-  shape.absarc(0, (args.length - args.width) / 2, args.width / 2, 0 * Math.PI, Math.PI, false);
-  shape.lineTo(-args.width / 2, -(args.length - args.width) / 2);
-  shape.absarc(0, -(args.length - args.width) / 2, -args.width / 2, 2 * Math.PI, Math.PI, false);
-  shape.lineTo(args.width / 2, (args.length - args.width) / 2);
-
-  var extrudeSettings = { depth: args.width, bevelEnabled: false };
-  var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-  var beam = new THREE.Mesh(geometry);
-
-
-
-  var beamBSP = CSG.fromMesh(beam);
-var resultBSP = beamBSP;
-
-  var slot = createSlot(args.holeWidth, args.holeLength + args.holeWidth, 0, args.width);
-
-
-var x = -args.length / 2 + args.width / 2 + args.holeLength / 2;
-
-var step = 0;
-if (args.holeCount > 1) {
-  step = args.holeLength + (args.length - args.holeCount * (args.holeLength) - (args.width - args.holeWidth)) / (args.holeCount - 1);
-}
-
-
-for (var i = 0; i < args.holeCount; i++) {
-
-  // Pass 1
-  slot.position.x = 0;
-  slot.position.y = x;
-  slot.position.z = 0;
-  var slotBSP = CSG.fromMesh(slot);
-  resultBSP = resultBSP.subtract(slotBSP);
-
-  // Pass 2
-  slot.rotateY(Math.PI / 2);
-  slot.position.x = -args.width / 2;
-  slot.position.y = x;
-  slot.position.z = args.width / 2;
-  var slotBSP = CSG.fromMesh(slot);
-  resultBSP = resultBSP.subtract(slotBSP);
-
-slot.rotateY(-Math.PI / 2);
-
-x += step;
-
-}
-
-
-  geometry = CSG.toGeometry(resultBSP);
-
-
-
-
-  beam = new PartsFactory.freeform(geometry, Colors.beam, false);
-
-  beam.position.z = -args.width / 2;
-
-  return beam;
-}
-
 function createMushroomBox(args) {
     var cornerSize = args.cornerSize;
     var thickness = args.depth;
@@ -229,19 +164,20 @@ function createCorner(args, i, label)
     shape.lineTo(size, size);
     shape.lineTo(size, 0);
 
-    var hole = new THREE.Path();
-    hole.moveTo(20, 50);
-    hole.lineTo(50, 20);
-    hole.lineTo(70, 20);
-    hole.lineTo(70, 40);
-    hole.lineTo(40, 70);
-    hole.lineTo(20, 70);
-    shape.holes = [hole];
+//    var hole = new THREE.Path();
+//    hole.moveTo(20, 50);
+//    hole.lineTo(50, 20);
+//    hole.lineTo(70, 20);
+//    hole.lineTo(70, 40);
+//    hole.lineTo(40, 70);
+//    hole.lineTo(20, 70);
+//    shape.holes = [hole];
 
     var extrudeSettings = { depth: thickness, bevelEnabled: false };
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     var corner = new THREE.Mesh(geometry);
     corner.position.z = -thickness / 2;
+    corner.updateMatrix();
     var cornerBSP = CSG.fromMesh(corner);
 
     var polyzapilivatel = createPolyzapilivatel(thickness, chamfer, size, 10);
@@ -249,12 +185,14 @@ function createCorner(args, i, label)
     // Pass 1
     polyzapilivatel.rotateY(Math.PI / 2);
     polyzapilivatel.position.y = size;
+    polyzapilivatel.updateMatrix();
     var polyzapilivatelBSP = CSG.fromMesh(polyzapilivatel);
     var resultBSP = cornerBSP.subtract(polyzapilivatelBSP);
 
     // Pass 2
     polyzapilivatel.rotateX(Math.PI / 2);
     polyzapilivatel.position.x = size;
+    polyzapilivatel.updateMatrix();
     polyzapilivatelBSP = CSG.fromMesh(polyzapilivatel);
     resultBSP = resultBSP.subtract(polyzapilivatelBSP);
 
@@ -266,7 +204,7 @@ function createCorner(args, i, label)
     var radius = halfEdgeLength * Math.sqrt(2);
     corner.position.x = radius * Math.sin(angle + Math.PI / 4);
     corner.position.y = radius * Math.cos(angle + Math.PI / 4);
-    corner.position.z = -thickness / 2;
+    //corner.position.z = -thickness / 2;
     corner.rotateZ(-angle);
 
     return corner;
@@ -287,6 +225,71 @@ function createPolyzapilivatel(thickness, chamfer, length, tolerance) {
     var polyzapilivatel = new THREE.Mesh(geometry);
 
     return polyzapilivatel;
+}
+
+function createBeamBase(args) {
+  var shape = new THREE.Shape();
+
+  shape.moveTo(args.width / 2, (args.length - args.width) / 2);
+  shape.absarc(0, (args.length - args.width) / 2, args.width / 2, 0 * Math.PI, Math.PI, false);
+  shape.lineTo(-args.width / 2, -(args.length - args.width) / 2);
+  shape.absarc(0, -(args.length - args.width) / 2, -args.width / 2, 2 * Math.PI, Math.PI, false);
+  shape.lineTo(args.width / 2, (args.length - args.width) / 2);
+
+  var extrudeSettings = { depth: args.width, bevelEnabled: false };
+  var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  var beam = new THREE.Mesh(geometry);
+
+
+
+  var beamBSP = CSG.fromMesh(beam);
+var resultBSP = beamBSP;
+
+  var slot = createSlot(args.holeWidth, args.holeLength + args.holeWidth, 0, args.width);
+
+
+var x = -args.length / 2 + args.width / 2 + args.holeLength / 2;
+
+var step = 0;
+if (args.holeCount > 1) {
+  step = args.holeLength + (args.length - args.holeCount * (args.holeLength) - (args.width - args.holeWidth)) / (args.holeCount - 1);
+}
+
+
+for (var i = 0; i < args.holeCount; i++) {
+
+  // Pass 1
+  slot.position.x = 0;
+  slot.position.y = x;
+  slot.position.z = 0;
+  var slotBSP = CSG.fromMesh(slot);
+  resultBSP = resultBSP.subtract(slotBSP);
+
+  // Pass 2
+  slot.rotateY(Math.PI / 2);
+  slot.position.x = -args.width / 2;
+  slot.position.y = x;
+  slot.position.z = args.width / 2;
+  var slotBSP = CSG.fromMesh(slot);
+  resultBSP = resultBSP.subtract(slotBSP);
+
+slot.rotateY(-Math.PI / 2);
+
+x += step;
+
+}
+
+
+  geometry = CSG.toGeometry(resultBSP);
+
+
+
+
+  beam = new PartsFactory.freeform(geometry, Colors.beam, false);
+
+  beam.position.z = -args.width / 2;
+
+  return beam;
 }
 
 function createSlot(width, length, offset, depth) {
