@@ -10,8 +10,8 @@ var Geometry = {
         { type : mushroominator.PSElementType.Rectangle, element : mushroominator.PSElement.rectangle_540_540, pos : [0, 225, 225], rotation : [90, 0, 0] },
     ],
     Testing : [
-        { type : mushroominator.PSElementType.Rectangle, element : mushroominator.PSElement.rectangle_540_540, pos : [2000, 1000, 0], rotation : [45, 45, 90] },
-        { type : mushroominator.PSElementType.LBeam, element : mushroominator.PSElement.beam_7_3_495_247, pos : [0, 0, 200], rotation : [45, 0, 0] },
+        { type : mushroominator.PSElementType.Rectangle, element : mushroominator.PSElement.rectangle_540_540, pos : [0, 0, 0], rotation : [0, 0, 0] },
+        //{ type : mushroominator.PSElementType.LBeam, element : mushroominator.PSElement.beam_7_3_495_247, pos : [0, 0, 200], rotation : [45, 0, 0] },
     ],
     Room : [
       { type : mushroominator.PSElementType.Room, element : mushroominator.PSElement.room_5000_4000_3000, pos : [0, 0, 0], rotation : [0, 0, 0] }

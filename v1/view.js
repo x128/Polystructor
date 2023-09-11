@@ -56,11 +56,13 @@ function create(options) {
     }
 
     // position and point the camera to the center of the scene
-    m_camera.position.x = -mushroominator.PSElement.room_5000_4000_3000.length;
-    m_camera.position.y = -mushroominator.PSElement.room_5000_4000_3000.width;
-    m_camera.position.z = mushroominator.PSElement.room_5000_4000_3000.height;
+    m_camera.position.x = 0;
+    //-mushroominator.PSElement.room_5000_4000_3000.length;
+    m_camera.position.y = 0;
+    //-mushroominator.PSElement.room_5000_4000_3000.width;
+    m_camera.position.z = - mushroominator.PSElement.room_5000_4000_3000.height;
 
-    m_camera.up.set(0, 0, 1);
+    m_camera.up.set(0, -1, 0);
 
     var pos = m_scene.position;
     m_camera.lookAt(pos);
